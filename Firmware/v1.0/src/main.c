@@ -43,8 +43,8 @@ volatile uint16_t sensorValue = 0;
 volatile float sensorDistanceCM = 0;
 
 volatile float pid_p = 0, pid_i = 0, pid_d = 0;
-volatile float T = 0.2, d = 0.8;
-volatile float setPoint = 25.0;
+volatile float T = 0.1, d = 0.8;
+volatile float setPoint = 20.8;
 
 volatile float d2y, dy, y;
 
@@ -479,7 +479,8 @@ int main() {
         if (watch_flag) USART1_TxStr("\n\r");
 
         
-        P = setPoint - y;
+        P = setPoint - sensorDistanceCM;
+        
         I = I + P * 0.025;
         D = dy;
 

@@ -1,2 +1,4 @@
 *.zip
 *.FCStd1
+.vscode
+.pio
