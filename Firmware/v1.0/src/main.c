@@ -42,7 +42,7 @@ volatile int16_t servoCenterPosition = 300;
 volatile uint16_t sensorValue = 0;
 volatile float sensorDistanceCM = 0;
 
-volatile float pid_p = 0, pid_i = 0, pid_d = 0;
+volatile float pid_p = 5, pid_i = 2, pid_d = -1;
 volatile float T = 0.1, d = 0.8;
 volatile float setPoint = 20.8;
 
@@ -414,9 +414,9 @@ void ftoa(float value, int decimals, char* buf) {
 // Список инструкций
 const char* instructions[] = { "set", "get", "watch", "save" };
 // Список аргументов для команды set
-const char* argSet[] = { "pid-p", "pid-i", "pid-d", "T", "d", "servo", "servo_default", "pid" };
+const char* argSet[] = { "pid-p", "pid-i", "pid-d", "T", "d", "servo", "servo_default", "regulator", "point" };
 // Список инструкций
-const char* argGet[] = { "all", "pid-p", "pid-i", "pid-d", "T", "d", "servo", "servo_default", "sensor", "pid" };
+const char* argGet[] = { "all", "pid-p", "pid-i", "pid-d", "T", "d", "servo", "servo_default", "sensor", "regulator", "point" };
 // Список инструкций
 const char* argWatch[] = { "sensor", "y", "dy"};
 // Количество элементов в массиве строк
@@ -481,7 +481,7 @@ int main() {
         
         P = setPoint - sensorDistanceCM;
         
-        I = I + P * 0.025;
+        if (servoPosition < 90 && servoPosition > -90) I = I + P * 0.025;
         D = dy;
 
         // Если регулятор включен
@@ -591,6 +591,12 @@ int main() {
                                 ftoa(regulator, 3, tmp);
                                 USART1_TxStr(tmp);
                                 USART1_TxStr("\n\r");
+                            } else if (arg_index == 8) {
+                                setPoint = atof(user_str->field[i]);
+                                USART1_TxStr("Target point is set to ");
+                                ftoa(setPoint, 3, tmp);
+                                USART1_TxStr(tmp);
+                                USART1_TxStr("\n\r");
                             }
                         }
                     } 
@@ -653,6 +659,11 @@ int main() {
                             } else if (arg_index == 9) {
                                 USART1_TxStr("Regulator state is ");
                                 ftoa(regulator, 2, tmp);
+                                USART1_TxStr(tmp);
+                                USART1_TxStr("\n\r");
+                            } else if (arg_index == 10) {
+                                USART1_TxStr("Target point is ");
+                                ftoa(setPoint, 2, tmp);
                                 USART1_TxStr(tmp);
                                 USART1_TxStr("\n\r");
                             }
